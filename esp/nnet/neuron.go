@@ -2,6 +2,7 @@ package nnet
 
 import (
 	"fmt"
+	"math"
 )
 
 type Neuron struct {
@@ -16,23 +17,57 @@ func NewNeuron(i, o int, g []float64) *Neuron {
 	}
 }
 
-func (n *Neuron) Output(input []float64) ([]float64, error) {
+// get the neuron's input sum
+func (n *Neuron) Input(input []float64) (float64, error) {
 	ni := len(input)       // number of inputs
 	niw := len(n.iweights) // number of input weights
-	now := len(n.oweights) // number of output weights
 
 	// error check for given input size
 	if ni != niw {
 		err := fmt.Errorf("Unmatching inputs: %d != %d\n", ni, niw)
-		return nil, err
+		return 0.0, err
 	}
 
-	outputs := make([]float64, now)
-	for i, _ := range outputs {
-		for j, in := range input {
-			outputs[i] += in * n.iweights[j]
+	// return input sum
+	return func() float64 {
+		is := 0.0
+		for i, in := range input {
+			is += in * n.iweights[i]
 		}
-	}
+		return is
+	}(), nil
+}
 
-	return outputs, nil
+// get the neuron's output values (post-activation)
+func (n *Neuron) Output(input float64) []float64 {
+	outputs := make([]float64, len(n.oweights))
+	for i, w := range n.oweights {
+		outputs[i] = w * input
+	}
+	return outputs
+}
+
+// create an activation function
+func ActivationFunc(fn string) func(float64) float64 {
+	switch fn {
+	case "step":
+		return step
+	case "sigmoid":
+		return sigmoid
+	default:
+		return nil
+	}
+}
+
+// step function
+func step(x float64) float64 {
+	if x < 0.0 {
+		return 0.0
+	}
+	return 1.0
+}
+
+// sigmoid function
+func sigmoid(x float64) float64 {
+	return 1.0 / (1 + math.Exp(x))
 }
