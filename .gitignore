@@ -1,1 +1,6 @@
+# OS Metadata
 .DS_Store
+.DS_Store?
+
+# Vim
+*.swp

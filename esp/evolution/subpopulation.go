@@ -1,4 +1,4 @@
-package esp
+package evolution
 
 import (
 	"math/rand"
@@ -11,7 +11,7 @@ type Chromosome struct {
 
 func NewChromosome(len int) *Chromosome {
 	return &Chromosome{
-		gene: func() {
+		gene: func() []float64 {
 			g := make([]float64, len)
 			for i, _ := range g {
 				g[i] = rand.Float64()
@@ -19,6 +19,11 @@ func NewChromosome(len int) *Chromosome {
 			return g
 		}(),
 	}
+}
+
+// get gene
+func (c *Chromosome) Gene() []float64 {
+	return c.gene
 }
 
 // define a subpopulation
@@ -34,7 +39,7 @@ func NewSubpopulation(s, l int) *Subpopulation {
 		ChromSize: l,
 		Chromosomes: func() []*Chromosome {
 			c := make([]*Chromosome, s)
-			for i, _ := range gp {
+			for i, _ := range c {
 				c[i] = NewChromosome(l)
 			}
 			return c
