@@ -1,27 +1,6 @@
 package evolution
 
-import (
-	"math/rand"
-)
-
-// define a chromosome
-type Chromosome struct {
-	Fitness int
-	Gene    []float64
-}
-
-func NewChromosome(len int) *Chromosome {
-	return &Chromosome{
-		Fitness: 0,
-		Gene: func() []float64 {
-			g := make([]float64, len)
-			for i, _ := range g {
-				g[i] = rand.Float64()
-			}
-			return g
-		}(),
-	}
-}
+import ()
 
 // define a subpopulation
 type Subpopulation struct {

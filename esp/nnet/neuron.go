@@ -6,16 +6,16 @@ import (
 )
 
 type Neuron struct {
-	InWeights  []float64
-	OutWeights []float64
-	Activation func(float64) float64
+	inWeights  []float64
+	outWeights []float64
+	activation func(float64) float64
 }
 
 func NewNeuron(in, out int, c *Chromosome, af string) *Neuron {
 	return &Neuron{
-		InWeights:  c.Gene[:in],
-		OutWeights: c.Gene[in:out],
-		Activation: func(fn string) func(float64) float64 {
+		inWeights:  c.Gene()[:in],
+		outWeights: c.Gene()[in:out],
+		activation: func(fn string) func(float64) float64 {
 			switch fn {
 			case "step":
 				return step
