@@ -6,57 +6,54 @@ import (
 )
 
 type Neuron struct {
-	iweights []float64
-	oweights []float64
+	InWeights  []float64
+	OutWeights []float64
+	Activation func(float64) float64
 }
 
-func NewNeuron(i, o int, g []float64) *Neuron {
+func NewNeuron(in, out int, c *Chromosome, af string) *Neuron {
 	return &Neuron{
-		iweights: g[:i],
-		oweights: g[i:o],
+		InWeights:  c.Gene[:in],
+		OutWeights: c.Gene[in:out],
+		Activation: func(fn string) func(float64) float64 {
+			switch fn {
+			case "step":
+				return step
+			case "sigmoid":
+				return sigmoid
+			default:
+				return nil
+			}
+		}(af),
 	}
 }
 
-// get the neuron's input sum
-func (n *Neuron) Input(input []float64) (float64, error) {
-	ni := len(input)       // number of inputs
-	niw := len(n.iweights) // number of input weights
+// get the neuron's output
+func (n *Neuron) Output(input []float64) ([]float64, error) {
+	ni := len(input)        // number of inputs
+	niw := len(n.InWeights) // number of input weights
 
 	// error check for given input size
 	if ni != niw {
 		err := fmt.Errorf("Unmatching inputs: %d != %d\n", ni, niw)
-		return 0.0, err
+		return nil, err
 	}
 
-	// return input sum
-	return func() float64 {
-		is := 0.0
+	// process signal
+	signal := func() float64 {
+		inputSum := 0.0
 		for i, in := range input {
-			is += in * n.iweights[i]
+			inputSum += in * n.InWeights[i]
 		}
-		return is
-	}(), nil
-}
+		return n.Activation(inputSum)
+	}()
 
-// get the neuron's output values (post-activation)
-func (n *Neuron) Output(input float64) []float64 {
-	outputs := make([]float64, len(n.oweights))
-	for i, w := range n.oweights {
-		outputs[i] = w * input
+	// get outputs
+	outputs := make([]float64, len(n.OutWeights))
+	for i, w := range n.OutWeights {
+		outputs[i] = w * signal
 	}
-	return outputs
-}
-
-// create an activation function
-func ActivationFunc(fn string) func(float64) float64 {
-	switch fn {
-	case "step":
-		return step
-	case "sigmoid":
-		return sigmoid
-	default:
-		return nil
-	}
+	return outputs, nil
 }
 
 // step function

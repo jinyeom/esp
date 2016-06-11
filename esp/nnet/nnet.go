@@ -4,15 +4,30 @@ import ()
 
 // Neural Network
 type NNet struct {
-	inputs  int       // number of inputs
-	outputs int       // number of outputs
-	neurons []*Neuron // neurons in this nnet
+	NumInputs  int       // number of inputs
+	NumOutputs int       // number of outputs
+	Neurons    []*Neuron // neurons in this nnet
 }
 
-func NewNNet(i, o int, n []*Neuron) *NNet {
+func New(numInputs, numOutputs int, neurons []*Neuron) *NNet {
 	return &NNet{
-		inputs:  i,
-		outputs: o,
-		neurons: n,
+		NumInputs:  numInputs,
+		NumOutputs: numOutputs,
+		Neurons:    neurons,
 	}
+}
+
+// update and return output
+func (n *NNet) Update(inputs []float64) ([]float64, error) {
+	outputs := make([]float64, n.NumOutputs)
+	for _, neuron := range n.Neurons {
+		out, err := neuron.Output(inputs)
+		if err != nil {
+			return nil, err
+		}
+		for i, _ := range outputs {
+			outputs[i] += out[i]
+		}
+	}
+	return outputs, nil
 }

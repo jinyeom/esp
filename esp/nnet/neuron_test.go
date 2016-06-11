@@ -23,12 +23,13 @@ func TestNeuron(t *testing.T) {
 	// test 1: empty chromosome
 	gene := make([]float64, N_INPUTS)
 	inputs := RandSliceF64(N_INPUTS)
-	n := NewNeuron(N_INPUTS, N_OUTPUTS, gene)
+	n := NewNeuron(N_INPUTS, N_OUTPUTS, gene, "sigmoid")
 
-	o, err := n.Input(inputs)
+	o, err := n.Output(inputs)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	t.Logf("%f\n", o)
+
 }
