@@ -1,4 +1,4 @@
-package nnet
+package esp
 
 import (
 	"math/rand"

@@ -1,4 +1,4 @@
-package nnet
+package esp
 
 import ()
 
@@ -9,7 +9,7 @@ type NNet struct {
 	neurons    []*Neuron // neurons in this nnet
 }
 
-func New(numInputs, numOutputs int, neurons []*Neuron) *NNet {
+func NewNNet(numInputs, numOutputs int, neurons []*Neuron) *NNet {
 	return &NNet{
 		numInputs:  numInputs,
 		numOutputs: numOutputs,
