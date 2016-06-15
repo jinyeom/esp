@@ -6,13 +6,15 @@ import (
 
 // define a chromosome
 type Chromosome struct {
-	fitness float64
-	gene    []float64
+	evaluated int       // number of evaluation times
+	score     float64   // total fitness score
+	gene      []float64 // input and output weights
 }
 
 func NewChromosome(len int) *Chromosome {
 	return &Chromosome{
-		fitness: 0,
+		evaluated: 0,
+		score:     0,
 		gene: func() []float64 {
 			g := make([]float64, len)
 			for i, _ := range g {
@@ -23,9 +25,15 @@ func NewChromosome(len int) *Chromosome {
 	}
 }
 
-// get fitness
+// get fitness average fitness score
 func (c *Chromosome) Fitness() float64 {
-	return c.fitness
+	return c.score / c.evaluated
+}
+
+// set fitness
+func (c *Chromosome) Evaluate(f float64) {
+	c.evaluated++
+	c.score += f
 }
 
 // get gene

@@ -23,14 +23,18 @@ func NewSubpopulation(s, l int) *Subpopulation {
 	}
 }
 
+// fitness-proportionate selection
+func (s *Subpopulation) FPSelect() *Chromosome {
+}
+
+// tournament selection
+func (s *Subpopulation) TSelect() *Chromosome {
+}
+
 // one point crossover
 func (s *Subpopulation) Crossover1P(c1, c2 int) {
-	cut := rand.Intn(s.SubpSize)
-	for i := cut; i < s.Size; i++ {
-		g1 := s.Chromosomes[c1].Gene[i]
-		g2 := s.Chromosomes[c2].Gene[i]
-
-		s.Chromosomes[c1].Gene[i] = g2
-		s.Chromosomes[c2].Gene[i] = g1
-	}
 }
+
+// two point crossover
+
+// uniform crossover

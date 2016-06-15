@@ -3,17 +3,16 @@ package esp
 import ()
 
 type ESP struct {
+	numInput  int
+	numOutput int
+
 	network    *NNet
 	population []*Subpopulation
-
-	selection  func()
-	crossover  func()
-	mutation   func()
-	evaluation func(...float64) float64
 }
 
-func New() *ESP {
-	return &ESP{}
+// new ESP given number of neurons
+func New(n int) *ESP {
+	return &ESP{
+		population: make([]*Subpopulation, n),
+	}
 }
-
-func Selection()
