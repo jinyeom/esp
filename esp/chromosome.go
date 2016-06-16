@@ -27,6 +27,9 @@ func NewChromosome(len int) *Chromosome {
 
 // get fitness average fitness score
 func (c *Chromosome) Fitness() float64 {
+	if c.evaluated == 0 {
+		return 0.0
+	}
 	return c.score / c.evaluated
 }
 
