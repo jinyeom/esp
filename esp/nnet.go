@@ -17,6 +17,16 @@ func NewNNet(numInputs, numOutputs int, neurons []*Neuron) *NNet {
 	}
 }
 
+// add a neuron
+func (n *NNet) AddNeuron(neuron *Neuron) {
+	n.neurons = append(n.neurons, neuron)
+}
+
+// remove all hidden neurons
+func (n *NNet) RemoveAll() {
+	n.neurons = nil
+}
+
 // update and return output
 func (n *NNet) Update(inputs []float64) ([]float64, error) {
 	outputs := make([]float64, n.numOutputs)
