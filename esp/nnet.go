@@ -9,22 +9,18 @@ type NNet struct {
 	neurons    []*Neuron // neurons in this nnet
 }
 
-func NewNNet(numInputs, numOutputs int, neurons []*Neuron) *NNet {
+// new neural network with no hidden neurons
+func NewNNet(numInputs, numOutputs int) *NNet {
 	return &NNet{
 		numInputs:  numInputs,
 		numOutputs: numOutputs,
-		neurons:    neurons,
+		neurons:    nil,
 	}
 }
 
-// add a neuron
-func (n *NNet) AddNeuron(neuron *Neuron) {
-	n.neurons = append(n.neurons, neuron)
-}
-
-// remove all hidden neurons
-func (n *NNet) RemoveAll() {
-	n.neurons = nil
+// provide hidden neurons
+func (n *NNet) AddNeurons(neurons []*Neuron) {
+	n.neurons = neurons
 }
 
 // update and return output
