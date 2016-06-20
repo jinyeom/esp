@@ -17,7 +17,7 @@ func NewSubpopulation(size, length int) *Subpopulation {
 		SubpSize:  size,
 		ChromSize: length,
 		Chromosomes: func() []*Chromosome {
-			c := make([]*Chromosome, s)
+			c := make([]*Chromosome, size)
 			for i, _ := range c {
 				c[i] = NewChromosome(length)
 			}
@@ -56,6 +56,7 @@ func (s *Subpopulation) TSelect() *Chromosome {
 			best = next
 		}
 	}
+	return s.Chromosomes[best]
 }
 
 // n tournament selection
@@ -72,5 +73,5 @@ func (s *Subpopulation) Crossover2P(c1, c2 int) {
 }
 
 // uniform crossover
-func (s *Subpoulation) UCrossover(c1, c2 int) {
+func (s *Subpopulation) UCrossover(c1, c2 int) {
 }

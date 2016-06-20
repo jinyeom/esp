@@ -31,7 +31,7 @@ func NewNeuron(in, out int, c *Chromosome, af string) *Neuron {
 // get the neuron's output
 func (n *Neuron) Output(input []float64) ([]float64, error) {
 	ni := len(input)        // number of inputs
-	niw := len(n.InWeights) // number of input weights
+	niw := len(n.inWeights) // number of input weights
 
 	// error check for given input size
 	if ni != niw {
@@ -43,14 +43,14 @@ func (n *Neuron) Output(input []float64) ([]float64, error) {
 	signal := func() float64 {
 		inputSum := 0.0
 		for i, in := range input {
-			inputSum += in * n.InWeights[i]
+			inputSum += in * n.inWeights[i]
 		}
-		return n.Activation(inputSum)
+		return n.activation(inputSum)
 	}()
 
 	// get outputs
-	outputs := make([]float64, len(n.OutWeights))
-	for i, w := range n.OutWeights {
+	outputs := make([]float64, len(n.outWeights))
+	for i, w := range n.outWeights {
 		outputs[i] = w * signal
 	}
 	return outputs, nil

@@ -77,13 +77,16 @@ func New(filename string) (*ESP, error) {
 	if path.Ext(filename) != ".esp" {
 		return nil, errors.New("Config file is not .esp file")
 	}
-	p := loadParam(filename)
+	p, err := loadParam(filename)
+	if err != nil {
+		return nil, err
+	}
 	return &ESP{
 		NumInput:  p["numInput"],
 		NumOutput: p["numOutput"],
 		NumNeuron: p["numNeuron"],
 		NNetwork:  NewNNet(p["numInput"], p["numOutput"]),
-		SubpSize:  subpSize,
+		SubpSize:  p["subpSize"],
 		Population: func() []*Subpopulation {
 			pop := make([]*Subpopulation, p["numNeuron"])
 			length := p["numInput"] + p["numOutput"]
