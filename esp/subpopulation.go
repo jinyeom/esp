@@ -30,6 +30,7 @@ func NewSubpopulation(size, length int) *Subpopulation {
 // fitness-proportionate selection (not recommended)
 func (s *Subpopulation) FPSelect() *Chromosome {
 	best := 0.0
+	// find the best fitness
 	for i := 0; i < s.SubpSize; i++ {
 		score := s.Chromosomes[i].Fitness()
 		s.Fitnesses[i] = score

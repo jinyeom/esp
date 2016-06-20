@@ -3,12 +3,14 @@ package esp
 import ()
 
 type ESP struct {
+	Param      *ESPParam        // ESP parameter
 	NNetwork   *NNet            // neural network
 	Population []*Subpopulation // group of subpopulations
 }
 
 func New(p *ESPParam) *ESP {
 	return &ESP{
+		Param:    p,
 		NNetwork: NewNNet(p.NumInput, p.NumOutput),
 		Population: func() []*Subpopulation {
 			pop := make([]*Subpopulation, p.NumNeuron)
@@ -19,8 +21,4 @@ func New(p *ESPParam) *ESP {
 			return pop
 		}(),
 	}
-}
-
-func (e *ESP) Run() {
-
 }

@@ -11,20 +11,12 @@ type Neuron struct {
 	activation func(float64) float64
 }
 
-func NewNeuron(in, out int, c *Chromosome, af string) *Neuron {
+func NewNeuron(numInput, numOutput int, c *Chromosome,
+	activation func(float64) float64) *Neuron {
 	return &Neuron{
 		inWeights:  c.Gene()[:in],
 		outWeights: c.Gene()[in:out],
-		activation: func(fn string) func(float64) float64 {
-			switch fn {
-			case "step":
-				return step
-			case "sigmoid":
-				return sigmoid
-			default:
-				return nil
-			}
-		}(af),
+		activation: activation,
 	}
 }
 
@@ -32,13 +24,11 @@ func NewNeuron(in, out int, c *Chromosome, af string) *Neuron {
 func (n *Neuron) Output(input []float64) ([]float64, error) {
 	ni := len(input)        // number of inputs
 	niw := len(n.inWeights) // number of input weights
-
 	// error check for given input size
 	if ni != niw {
 		err := fmt.Errorf("Unmatching inputs: %d != %d\n", ni, niw)
 		return nil, err
 	}
-
 	// process signal
 	signal := func() float64 {
 		inputSum := 0.0
@@ -47,24 +37,10 @@ func (n *Neuron) Output(input []float64) ([]float64, error) {
 		}
 		return n.activation(inputSum)
 	}()
-
 	// get outputs
 	outputs := make([]float64, len(n.outWeights))
 	for i, w := range n.outWeights {
 		outputs[i] = w * signal
 	}
 	return outputs, nil
-}
-
-// step function
-func step(x float64) float64 {
-	if x < 0.0 {
-		return 0.0
-	}
-	return 1.0
-}
-
-// sigmoid function
-func sigmoid(x float64) float64 {
-	return 1.0 / (1 + math.Exp(x))
 }

@@ -15,6 +15,8 @@ func TestNNet(*testing.T) {
 	n := NewNNet(N_INPUTS, N_OUTPUTS, neurons)
 	n.Update([]float64{1, 2, 3, 4, 5})
 	// test 2: 1 neurons
-
+	neurons = make([]*Neuron, 1)
+	n = NewNNet(N_INPUTS, N_OUTPUTS, neurons)
+	n.Update([]float64{1, 2, 3, 4, 5})
 	// test 3: n neurons
 }

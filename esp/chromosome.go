@@ -6,7 +6,7 @@ import (
 
 // define a chromosome
 type Chromosome struct {
-	evaluated int       // number of evaluation times
+	evaluated float64   // number of evaluation times
 	score     float64   // total fitness score
 	gene      []float64 // input and output weights
 }
@@ -30,7 +30,7 @@ func (c *Chromosome) Fitness() float64 {
 	if c.evaluated == 0 {
 		return 0.0
 	}
-	return c.score / float64(c.evaluated)
+	return c.score / c.evaluated
 }
 
 // set fitness
@@ -42,4 +42,9 @@ func (c *Chromosome) Evaluate(f float64) {
 // get gene
 func (c *Chromosome) Gene() []float64 {
 	return c.gene
+}
+
+// mutation with Gaussian Convolution
+func (c *Chromosome) Mutate() {
+
 }
