@@ -49,19 +49,14 @@ func (s *Subpopulation) FPSelect() *Chromosome {
 
 // binary tournament selection
 func (s *Subpopulation) TSelect() *Chromosome {
-	best := s.Fitnesses[rand.Intn(s.SubpSize)]
+	best := rand.Intn(s.SubpSize)
 	for i := 1; i < s.SubpSize; i++ {
-		next := s.Fitnesses[rand.Intn(s.SubpSize)]
-		if next > best {
+		next := rand.Intn(s.SubpSize)
+		if s.Fitnesses[next] > s.Fitnesses[best] {
 			best = next
 		}
 	}
 	return s.Chromosomes[best]
-}
-
-// n tournament selection
-func (s *Subpopulation) TSelectn(n int) *Chromosome {
-
 }
 
 // one point crossover
