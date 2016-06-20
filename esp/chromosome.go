@@ -30,7 +30,7 @@ func (c *Chromosome) Fitness() float64 {
 	if c.evaluated == 0 {
 		return 0.0
 	}
-	return c.score / c.evaluated
+	return c.score / float64(c.evaluated)
 }
 
 // set fitness

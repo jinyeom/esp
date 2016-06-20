@@ -1,8 +1,11 @@
 package esp
 
 import (
+	"bufio"
+	"errors"
 	"log"
 	"os"
+	"path"
 	"strconv"
 )
 
@@ -95,4 +98,5 @@ func New(filename string) (*ESP, error) {
 }
 
 func (e *ESP) Run() {
+
 }
