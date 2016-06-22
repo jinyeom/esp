@@ -1,7 +1,5 @@
 package esp
 
-import ()
-
 type ESP struct {
 	Param      *ESPParam        // ESP parameter
 	NNetwork   *NNet            // neural network

@@ -1,7 +1,5 @@
 package esp
 
-import ()
-
 // Neural Network
 type NNet struct {
 	numInputs  int       // number of inputs

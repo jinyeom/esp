@@ -27,27 +27,6 @@ func NewSubpopulation(size, length int) *Subpopulation {
 	}
 }
 
-// fitness-proportionate selection (not recommended)
-func (s *Subpopulation) FPSelect() *Chromosome {
-	best := 0.0
-	// find the best fitness
-	for i := 0; i < s.SubpSize; i++ {
-		score := s.Chromosomes[i].Fitness()
-		s.Fitnesses[i] = score
-		if score > best {
-			best = score
-		}
-	}
-	// stochastic acceptance
-	for {
-		i := rand.Intn(s.SubpSize)
-		r := s.Fitnesses[i] / best
-		if rand.Float64() < r {
-			return s.Chromosomes[i]
-		}
-	}
-}
-
 // binary tournament selection
 func (s *Subpopulation) TSelect() *Chromosome {
 	best := rand.Intn(s.SubpSize)
@@ -58,16 +37,4 @@ func (s *Subpopulation) TSelect() *Chromosome {
 		}
 	}
 	return s.Chromosomes[best]
-}
-
-// one point crossover
-func (s *Subpopulation) Crossover1P(c1, c2 int) {
-}
-
-// two point crossover
-func (s *Subpopulation) Crossover2P(c1, c2 int) {
-}
-
-// uniform crossover
-func (s *Subpopulation) UCrossover(c1, c2 int) {
 }

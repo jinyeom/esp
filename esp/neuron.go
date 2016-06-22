@@ -2,7 +2,6 @@ package esp
 
 import (
 	"fmt"
-	"math"
 )
 
 type Neuron struct {
@@ -14,8 +13,8 @@ type Neuron struct {
 func NewNeuron(numInput, numOutput int, c *Chromosome,
 	activation func(float64) float64) *Neuron {
 	return &Neuron{
-		inWeights:  c.Gene()[:in],
-		outWeights: c.Gene()[in:out],
+		inWeights:  c.Gene()[:numInput],
+		outWeights: c.Gene()[numInput:numOutput],
 		activation: activation,
 	}
 }
