@@ -2,28 +2,32 @@ package esp
 
 // Neural Network
 type NNet struct {
-	numInputs  int       // number of inputs
-	numOutputs int       // number of outputs
-	neurons    []*Neuron // neurons in this nnet
+	numInput  int       // number of inputs
+	numOutput int       // number of outputs
+	neurons   []*Neuron // neurons in this nnet
 }
 
 // new neural network with no hidden neurons
-func NewNNet(numInputs, numOutputs int) *NNet {
+func NewNNet(numInput, numOutput int) *NNet {
 	return &NNet{
-		numInputs:  numInputs,
-		numOutputs: numOutputs,
-		neurons:    nil,
+		numInput:  numInput,
+		numOutput: numOutput,
+		neurons:   nil,
 	}
 }
 
 // provide hidden neurons
-func (n *NNet) AddNeurons(neurons []*Neuron) {
-	n.neurons = neurons
+func (n *NNet) AddNeurons(c []*Chromosome) {
+	n.neurons = make([]*Neuron, len(c))
+	for i, _ := range n.neurons {
+		neuron := NewNeuron(n.numInput, n.numOutput, c[i])
+		n.neurons[i] = neuron
+	}
 }
 
 // update and return output
 func (n *NNet) Update(inputs []float64) ([]float64, error) {
-	outputs := make([]float64, n.numOutputs)
+	outputs := make([]float64, n.numOutput)
 	for _, neuron := range n.neurons {
 		out, err := neuron.Output(inputs)
 		if err != nil {

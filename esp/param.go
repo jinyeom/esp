@@ -16,6 +16,7 @@ type ESPParam struct {
 	NumNeuron     int
 	SubpSize      int
 	NumGeneration int
+	NumAvgEval    int
 	MutationRate  float64
 	CrossoverRate float64
 }
@@ -51,6 +52,7 @@ func NewESPParam(filename string) (*ESPParam, error) {
 		NumNeuron:     int(fd["NUM_NEURON"]),
 		SubpSize:      int(fd["SUBP_SIZE"]),
 		NumGeneration: int(fd["NUM_GENERATION"]),
+		NumAvgEval:    int(fd["NUM_AVG_EVAL"]),
 		MutationRate:  fd["MUTATION_RATE"],
 		CrossoverRate: fd["CROSSOVER_RATE"],
 	}, nil

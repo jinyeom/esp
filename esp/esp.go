@@ -1,16 +1,23 @@
 package esp
 
+import (
+	"fmt"
+	"math/rand"
+)
+
 type ESP struct {
-	Param      *ESPParam        // ESP parameter
-	NNetwork   *NNet            // neural network
-	Population []*Subpopulation // group of subpopulations
+	param      *ESPParam        // ESP parameter
+	network    *NNet            // neural network
+	population []*Subpopulation // group of subpopulations
+	bestScore  float64          // best score
+	BestNNet   *NNet            // best performing neural network
 }
 
 func New(p *ESPParam) *ESP {
 	return &ESP{
-		Param:    p,
-		NNetwork: NewNNet(p.NumInput, p.NumOutput),
-		Population: func() []*Subpopulation {
+		param:   p,
+		network: NewNNet(p.NumInput, p.NumOutput),
+		population: func() []*Subpopulation {
 			pop := make([]*Subpopulation, p.NumNeuron)
 			length := p.NumInput + p.NumOutput
 			for i := 0; i < p.NumNeuron; i++ {
@@ -18,5 +25,61 @@ func New(p *ESPParam) *ESP {
 			}
 			return pop
 		}(),
+		bestScore: 1000.0,
+		BestNNet:  NewNNet(p.NumInput, p.NumOutput),
+	}
+}
+
+// update the best score and best performing nnet
+func (e *ESP) updateBest(ns float64, c []*Chromosome) {
+	if ns < e.bestScore {
+		fmt.Printf("best score = %f\n", ns)
+		e.bestScore = ns
+		e.BestNNet = NewNNet(e.param.NumInput, e.param.NumOutput)
+		e.BestNNet.AddNeurons(c)
+	}
+}
+
+// run ESP given an evaluation function
+func (e *ESP) Run(evalfunc func(nn *NNet) float64) {
+	indices := make([]int, e.param.NumNeuron)
+	chroms := make([]*Chromosome, e.param.NumNeuron)
+	numEval := e.param.NumAvgEval * e.param.NumNeuron
+	for i := 0; i < e.param.NumGeneration; i++ {
+		for j := 0; j < numEval; j++ {
+			// select neurons
+			for index, _ := range indices {
+				// randomly select an index
+				rn := rand.Intn(e.param.SubpSize)
+				c := e.population[index].chromosomes[rn]
+				chroms[index] = c
+				indices[index] = rn
+			}
+			// create neural network and evaluate
+			e.network.AddNeurons(chroms)
+			score := evalfunc(e.network)
+			// update the best neural network
+			e.updateBest(score, chroms)
+			for subpIndex, chromIndex := range indices {
+				// evaluate each selected chromosome
+				e.population[subpIndex].
+					chromosomes[chromIndex].Evaluate(score)
+			}
+		}
+		// crossover
+		for i, subp := range e.population {
+			p1 := subp.TSelect()
+			p2 := subp.TSelect()
+			parent1 := e.population[i].chromosomes[p1]
+			parent2 := e.population[i].chromosomes[p2]
+			child1, child2 :=
+				UCrossover(parent1, parent2, e.param.CrossoverRate)
+			// mutation
+			child1.Mutate()
+			child2.Mutate()
+			// population update
+			e.population[i].chromosomes[p1] = child1
+			e.population[i].chromosomes[p2] = child2
+		}
 	}
 }

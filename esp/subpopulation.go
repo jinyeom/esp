@@ -6,35 +6,37 @@ import (
 
 // define a subpopulation
 type Subpopulation struct {
-	SubpSize    int           // size of subpopulation
-	ChromSize   int           // size of chromosome
-	Chromosomes []*Chromosome // gene pool for neurons
-	Fitnesses   []float64     // list of fitness scores in order
+	subpSize    int           // size of subpopulation
+	chromSize   int           // size of chromosome
+	chromosomes []*Chromosome // gene pool for neurons
+	fitnesses   []float64     // list of fitness scores in order
 }
 
 func NewSubpopulation(size, length int) *Subpopulation {
 	return &Subpopulation{
-		SubpSize:  size,
-		ChromSize: length,
-		Chromosomes: func() []*Chromosome {
+		subpSize:  size,
+		chromSize: length,
+		chromosomes: func() []*Chromosome {
 			c := make([]*Chromosome, size)
 			for i, _ := range c {
 				c[i] = NewChromosome(length)
 			}
 			return c
 		}(),
-		Fitnesses: make([]float64, size),
+		fitnesses: make([]float64, size),
 	}
 }
 
-// binary tournament selection
-func (s *Subpopulation) TSelect() *Chromosome {
-	best := rand.Intn(s.SubpSize)
-	for i := 1; i < s.SubpSize; i++ {
-		next := rand.Intn(s.SubpSize)
-		if s.Fitnesses[next] > s.Fitnesses[best] {
+// binary tournament selection (return index)
+func (s *Subpopulation) TSelect() int {
+	best := rand.Intn(s.subpSize)
+	for i := 1; i < s.subpSize; i++ {
+		next := rand.Intn(s.subpSize)
+		nfit := s.chromosomes[next].Fitness()
+		bfit := s.chromosomes[best].Fitness()
+		if nfit < bfit {
 			best = next
 		}
 	}
-	return s.Chromosomes[best]
+	return best
 }

@@ -2,21 +2,24 @@ package esp
 
 import (
 	"fmt"
+	"math"
 )
 
 type Neuron struct {
 	inWeights  []float64
 	outWeights []float64
-	activation func(float64) float64
 }
 
-func NewNeuron(numInput, numOutput int, c *Chromosome,
-	activation func(float64) float64) *Neuron {
+func NewNeuron(in, out int, c *Chromosome) *Neuron {
 	return &Neuron{
-		inWeights:  c.Gene()[:numInput],
-		outWeights: c.Gene()[numInput:numOutput],
-		activation: activation,
+		inWeights:  c.Gene()[:in],
+		outWeights: c.Gene()[in : in+out],
 	}
+}
+
+// sigmoid function for activation
+func sigmoid(x float64) float64 {
+	return 1.0 / (1.0 + math.Exp(x))
 }
 
 // get the neuron's output
@@ -34,7 +37,7 @@ func (n *Neuron) Output(input []float64) ([]float64, error) {
 		for i, in := range input {
 			inputSum += in * n.inWeights[i]
 		}
-		return n.activation(inputSum)
+		return sigmoid(inputSum)
 	}()
 	// get outputs
 	outputs := make([]float64, len(n.outWeights))
