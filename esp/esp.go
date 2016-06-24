@@ -16,17 +16,17 @@ type ESP struct {
 func New(p *ESPParam) *ESP {
 	return &ESP{
 		param:   p,
-		network: NewNNet(p.NumInput, p.NumOutput),
+		network: NewNNet(p.NumInput, p.NumOutput, p.NumNeuron),
 		population: func() []*Subpopulation {
 			pop := make([]*Subpopulation, p.NumNeuron)
-			length := p.NumInput + p.NumOutput
+			length := p.NumInput + p.NumOutput + 1
 			for i := 0; i < p.NumNeuron; i++ {
 				pop[i] = NewSubpopulation(p.SubpSize, length)
 			}
 			return pop
 		}(),
 		bestScore: 1000.0,
-		BestNNet:  NewNNet(p.NumInput, p.NumOutput),
+		BestNNet:  NewNNet(p.NumInput, p.NumOutput, p.NumNeuron),
 	}
 }
 
@@ -35,8 +35,9 @@ func (e *ESP) updateBest(ns float64, c []*Chromosome) {
 	if ns < e.bestScore {
 		fmt.Printf("best score = %f\n", ns)
 		e.bestScore = ns
-		e.BestNNet = NewNNet(e.param.NumInput, e.param.NumOutput)
-		e.BestNNet.AddNeurons(c)
+		e.BestNNet = NewNNet(e.param.NumInput,
+			e.param.NumOutput, e.param.NumNeuron)
+		e.BestNNet.Build(c)
 	}
 }
 
@@ -44,7 +45,7 @@ func (e *ESP) updateBest(ns float64, c []*Chromosome) {
 func (e *ESP) Run(evalfunc func(nn *NNet) float64) {
 	indices := make([]int, e.param.NumNeuron)
 	chroms := make([]*Chromosome, e.param.NumNeuron)
-	numEval := e.param.NumAvgEval * e.param.NumNeuron
+	numEval := e.param.NumAvgEval * e.param.NumNeuron * e.param.SubpSize
 	for i := 0; i < e.param.NumGeneration; i++ {
 		for j := 0; j < numEval; j++ {
 			// select neurons
@@ -56,7 +57,7 @@ func (e *ESP) Run(evalfunc func(nn *NNet) float64) {
 				indices[index] = rn
 			}
 			// create neural network and evaluate
-			e.network.AddNeurons(chroms)
+			e.network.Build(chroms)
 			score := evalfunc(e.network)
 			// update the best neural network
 			e.updateBest(score, chroms)
@@ -75,8 +76,8 @@ func (e *ESP) Run(evalfunc func(nn *NNet) float64) {
 			child1, child2 :=
 				UCrossover(parent1, parent2, e.param.CrossoverRate)
 			// mutation
-			child1.Mutate()
-			child2.Mutate()
+			child1.Mutate(e.param.MutationRate)
+			child2.Mutate(e.param.MutationRate)
 			// population update
 			e.population[i].chromosomes[p1] = child1
 			e.population[i].chromosomes[p2] = child2

@@ -18,7 +18,8 @@ func NewChromosome(len int) *Chromosome {
 		gene: func() []float64 {
 			g := make([]float64, len)
 			for i, _ := range g {
-				g[i] = rand.Float64()
+				// based on Dave Moriarty's method
+				g[i] = (rand.Float64() * 12.0) - 6.0
 			}
 			return g
 		}(),
@@ -68,6 +69,11 @@ func (c *Chromosome) Gene() []float64 {
 }
 
 // mutation with Gaussian Convolution
-func (c *Chromosome) Mutate() {
-
+func (c *Chromosome) Mutate(r float64) {
+	for i, _ := range c.gene {
+		if rand.Float64() < r {
+			mut := rand.NormFloat64()
+			c.gene[i] += mut
+		}
+	}
 }
