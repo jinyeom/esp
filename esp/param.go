@@ -19,6 +19,7 @@ type ESPParam struct {
 	NumAvgEval    int
 	MutationRate  float64
 	CrossoverRate float64
+	Response      float64
 }
 
 func NewESPParam(filename string) (*ESPParam, error) {
@@ -55,5 +56,6 @@ func NewESPParam(filename string) (*ESPParam, error) {
 		NumAvgEval:    int(fd["NUM_AVG_EVAL"]),
 		MutationRate:  fd["MUTATION_RATE"],
 		CrossoverRate: fd["CROSSOVER_RATE"],
+		Response:      fd["RESPONSE"],
 	}, nil
 }

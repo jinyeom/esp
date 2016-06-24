@@ -4,23 +4,26 @@ import (
 	"math"
 )
 
-const BIAS = -1.0
-
 // Neural Network
 type NNet struct {
 	numInput  int       // number of inputs
 	numOutput int       // number of outputs
 	numNeuron int       // number of neurons
 	weights   []float64 // list of weights
+	// sigmoid function for activation
+	sigmoid func(float64) float64
 }
 
 // new neural network with no hidden neurons
-func NewNNet(numInput, numOutput, numNeuron int) *NNet {
+func NewNNet(ni, no, nn int, resp float64) *NNet {
 	return &NNet{
-		numInput:  numInput,
-		numOutput: numOutput,
-		numNeuron: numNeuron,
+		numInput:  ni,
+		numOutput: no,
+		numNeuron: nn,
 		weights:   []float64{},
+		sigmoid: func(x float64) float64 {
+			return 1.0 / (1.0 + math.Exp(-x/resp))
+		},
 	}
 }
 
@@ -33,11 +36,6 @@ func (n *NNet) Build(c []*Chromosome) {
 	}
 }
 
-// sigmoid function
-func sigmoid(x, resp float64) float64 {
-	return 1.0 / (1.0 + math.Exp(-x/resp))
-}
-
 // update and return output
 func (n *NNet) Update(inputs []float64) []float64 {
 	outputs := make([]float64, n.numOutput)
@@ -48,14 +46,14 @@ func (n *NNet) Update(inputs []float64) []float64 {
 			netInput += input * n.weights[counter]
 			counter++
 		}
-		signal := sigmoid(netInput, 0.05)
+		signal := n.sigmoid(netInput)
 		for j, _ := range outputs {
 			outputs[j] += n.weights[counter] * signal
 			counter++
 		}
 	}
 	for i, output := range outputs {
-		outputs[i] = sigmoid(output, 0.05)
+		outputs[i] = n.sigmoid(output)
 	}
 	return outputs
 }
