@@ -26,7 +26,7 @@ func New(p *ESPParam) *ESP {
 			}
 			return pop
 		}(),
-		bestScore: 100000.0,
+		bestScore: p.InitBestScore,
 		bestNNet: NewNNet(p.NumInput, p.NumOutput,
 			p.NumNeuron, p.Response),
 	}

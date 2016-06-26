@@ -3,6 +3,7 @@ package esp
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"os"
 	"path"
 	"strconv"
@@ -20,6 +21,7 @@ type ESPParam struct {
 	MutationRate  float64
 	CrossoverRate float64
 	Response      float64
+	InitBestScore float64
 }
 
 func NewESPParam(filename string) (*ESPParam, error) {
@@ -57,5 +59,20 @@ func NewESPParam(filename string) (*ESPParam, error) {
 		MutationRate:  fd["MUTATION_RATE"],
 		CrossoverRate: fd["CROSSOVER_RATE"],
 		Response:      fd["RESPONSE"],
+		InitBestScore: fd["INIT_BEST_SCORE"],
 	}, nil
+}
+
+// print parameter
+func (p *ESPParam) Show() {
+	fmt.Printf("%-30s%d\n", "Number of inputs: ", p.NumInput)
+	fmt.Printf("%-30s%d\n", "Number of outputs: ", p.NumOutput)
+	fmt.Printf("%-30s%d\n", "Number of neurons: ", p.NumNeuron)
+	fmt.Printf("%-30s%d\n", "Subpopulation size: ", p.SubpSize)
+	fmt.Printf("%-30s%d\n", "Number of generations: ", p.NumGeneration)
+	fmt.Printf("%-30s%d\n", "Number of avg. evaluation: ", p.NumAvgEval)
+	fmt.Printf("%-30s%f\n", "Mutation rate: ", p.MutationRate)
+	fmt.Printf("%-30s%f\n", "Crossover rate: ", p.CrossoverRate)
+	fmt.Printf("%-30s%f\n", "Activation response: ", p.Response)
+	fmt.Printf("%-30s%f\n", "Initial best score: ", p.InitBestScore)
 }

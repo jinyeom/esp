@@ -39,11 +39,11 @@ func UCrossover(p1, p2 *Chromosome, m float64) (c1, c2 *Chromosome) {
 		}
 	}
 	return &Chromosome{
-			evaluated: 0.0,
+			evaluated: 0,
 			score:     0.0,
 			gene:      g1,
 		}, &Chromosome{
-			evaluated: 0.0,
+			evaluated: 0,
 			score:     0.0,
 			gene:      g2,
 		}
