@@ -28,6 +28,7 @@ func NewSubpopulation(size, length int) *Subpopulation {
 }
 
 // binary tournament selection (return index)
+// the lower the fitness is the better
 func (s *Subpopulation) TSelect() int {
 	best := rand.Intn(s.subpSize)
 	for i := 1; i < s.subpSize; i++ {

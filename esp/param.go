@@ -12,16 +12,16 @@ import (
 
 // ESP parameter
 type ESPParam struct {
-	NumInput      int
-	NumOutput     int
-	NumNeuron     int
-	SubpSize      int
-	NumGeneration int
-	NumAvgEval    int
-	MutationRate  float64
-	CrossoverRate float64
-	Response      float64
-	InitBestScore float64
+	NumInput      int     // number of inputs (+1 for bias)
+	NumOutput     int     // number of outputs
+	NumNeuron     int     // number of neurons
+	SubpSize      int     // subpopulation size
+	NumGeneration int     // number of generations
+	NumAvgEval    int     // number of average evaluations
+	MutationRate  float64 // mutation rate
+	CrossoverRate float64 // crossover rate
+	Response      float64 // activation response for sigmoid function
+	InitBestScore float64 // initial best score
 }
 
 func NewESPParam(filename string) (*ESPParam, error) {
