@@ -12,9 +12,9 @@ import (
 
 // ESP parameter
 type ESPParam struct {
-	NumInput      int     // number of inputs (+1 for bias)
+	NumInput      int     // number of inputs
 	NumOutput     int     // number of outputs
-	NumNeuron     int     // number of neurons
+	NumNeuron     int     // number of neurons (+1 for bias)
 	SubpSize      int     // subpopulation size
 	NumGeneration int     // number of generations
 	NumAvgEval    int     // number of average evaluations

@@ -20,8 +20,10 @@ func New(p *ESPParam) *ESP {
 			p.NumNeuron, p.Response),
 		population: func() []*Subpopulation {
 			pop := make([]*Subpopulation, p.NumNeuron)
-			length := p.NumInput + p.NumOutput + 1
-			for i := 0; i < p.NumNeuron; i++ {
+			length := p.NumInput + p.NumOutput
+			biasLen := p.NumOutput + p.NumNeuron - 1
+			pop[0] = NewSubpopulation(p.SubpSize, biasLen)
+			for i := 1; i < p.NumNeuron; i++ {
 				pop[i] = NewSubpopulation(p.SubpSize, length)
 			}
 			return pop
