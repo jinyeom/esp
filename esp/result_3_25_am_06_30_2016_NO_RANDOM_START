@@ -1,0 +1,50 @@
+=== RUN   TestPoleBalancing
+Seed: 1467275086878813403
+Number of inputs:             4
+Number of outputs:            2
+Number of neurons:            10
+Subpopulation size:           40
+Number of generations:        200
+Number of avg. evaluation:    10
+Mutation rate:                0.300000
+Crossover rate:               0.300000
+Activation response:          0.050000
+Initial best score:           120000.000000
+best score: 119992.000000
+best score: 119991.000000
+best score: 119988.000000
+best score: 119969.000000
+best score: 119950.000000
+best score: 119914.000000
+best score: 119811.000000
+best score: 119729.000000
+best score: 119676.000000
+best score: 0.000000
+--- PASS: TestPoleBalancing (16.24s)
+	pole_balancing_test.go:117: Best time: 120000.000000
+=== RUN   TestXor
+Seed: 1467275103122540012
+Number of inputs:             2
+Number of outputs:            1
+Number of neurons:            3
+Subpopulation size:           20
+Number of generations:        50
+Number of avg. evaluation:    10
+Mutation rate:                0.300000
+Crossover rate:               0.300000
+Activation response:          0.050000
+Initial best score:           10000.000000
+best score: 2.000000
+best score: 1.978466
+best score: 0.891336
+best score: 0.702425
+best score: 0.000000
+best score: 0.000000
+best score: 0.000000
+1 xor 1 = 0.000000
+1 xor 0 = 1.000000
+0 xor 1 = 1.000000
+0 xor 0 = 0.000000
+--- PASS: TestXor (0.07s)
+PASS
+ok  	github.com/jinseokYeom/esp	16.322s

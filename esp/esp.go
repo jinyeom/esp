@@ -37,7 +37,7 @@ func New(p *ESPParam) *ESP {
 // update the best score and best performing nnet
 func (e *ESP) updateBest(ns float64, c []*Chromosome) {
 	if ns < e.bestScore {
-		fmt.Printf("best score = %f\n", ns)
+		fmt.Printf("best score: %f\n", ns)
 		e.bestScore = ns
 		e.bestNNet = NewNNet(e.param.NumInput, e.param.NumOutput,
 			e.param.NumNeuron, e.param.Response)

@@ -5,6 +5,8 @@
     **This pole balancing test experiment is based on David Moriarty's
     experiment in June 1994 from http://nn.cs.utexas.edu/?sanepolebalancing.
 
+    Evaluation in this experiment is with MAX_TIME - time, not time itself,
+    meaning, the lower the score is, the better.
 */
 
 package esp
@@ -30,7 +32,7 @@ const (
 	FORCE_MAG    = 10.0     // force applied to the cart
 	TAU          = 0.02     // seconds between state updates
 	MAX_TIME     = 120000.0 // given time for each test
-	RANDOM_START = true     // true if start randomly
+	RANDOM_START = false    // true if start randomly
 )
 
 var (
@@ -45,10 +47,10 @@ func poleBalancing(nn *NNet) float64 {
 	// inputs[3]: (theta_dot) pole angular velocity
 	inputs := make([]float64, 4)
 	if RANDOM_START {
-		inputs[0] = float64(rand.Int63()%4800)/1000.0 - X_LIM
-		inputs[1] = float64(rand.Int63()%2000)/1000.0 - DX_LIM
-		inputs[2] = float64(rand.Int63()%400)/1000.0 - TH_LIM
-		inputs[3] = float64(rand.Int63()%3000)/1000.0 - DTH_LIM
+		inputs[0] = float64(rand.Int31()%4800)/1000.0 - X_LIM
+		inputs[1] = float64(rand.Int31()%2000)/1000.0 - DX_LIM
+		inputs[2] = float64(rand.Int31()%400)/1000.0 - TH_LIM
+		inputs[3] = float64(rand.Int31()%3000)/1000.0 - DTH_LIM
 	}
 	// play the game
 	t := 0.0
@@ -62,7 +64,7 @@ func poleBalancing(nn *NNet) float64 {
 		th := inputs[2] // theta
 		if x < -X_LIM || x > X_LIM ||
 			th < -TH_LIM || th > TH_LIM {
-			return t
+			return MAX_TIME - t
 		}
 		t++
 	}
@@ -75,16 +77,18 @@ func cartPole(action bool, inputs []float64) []float64 {
 	if action {
 		force = -FORCE_MAG
 	}
-	theta := inputs[2]
-	cosTh := math.Cos(theta)
-	sinTh := math.Sin(theta)
+	th := inputs[2]
+	dth := inputs[3]
+	cosTh := math.Cos(th)
+	sinTh := math.Sin(th)
 	temp := (force + POLE_MASS_LENGTH*
-		theta*theta*sinTh) / TOTAL_MASS
+		dth*dth*sinTh) / TOTAL_MASS
 	// angular acceleration
 	ath := (GRAVITY*sinTh - cosTh*temp) /
-		(LENGTH * (3.0/4.0 - POLE_MASS*cosTh*cosTh/TOTAL_MASS))
+		(LENGTH * (4.0/3.0 - POLE_MASS*cosTh*cosTh/TOTAL_MASS))
 	// x acceleration
 	ax := temp - POLE_MASS_LENGTH*ath*cosTh/TOTAL_MASS
+
 	// update states
 	inputs[0] += TAU * inputs[1]
 	inputs[1] += TAU * ax
@@ -109,6 +113,6 @@ func TestPoleBalancing(t *testing.T) {
 
 	// test the best neural network
 	nn := e.BestNNet()
-	bestScore := MAX_TIME - poleBalancing(nn)
-	t.Logf("Best time: %f\n", bestScore)
+	bestScore := poleBalancing(nn)
+	fmt.Printf("Best time: %f\n", MAX_TIME-bestScore)
 }
