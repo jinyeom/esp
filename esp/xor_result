@@ -1,0 +1,23 @@
+=== RUN   TestXor
+Seed: 1467247148551854379
+Number of inputs:             2
+Number of outputs:            1
+Number of neurons:            3
+Subpopulation size:           20
+Number of generations:        50
+Number of avg. evaluation:    10
+Mutation rate:                0.300000
+Crossover rate:               0.300000
+Activation response:          0.050000
+Initial best score:           10000.000000
+best score = 1.940029
+best score = 1.000000
+best score = 0.000000
+best score = 0.000000
+--- PASS: TestXor (0.07s)
+	xor_test.go:42: 1 xor 1 = 0.000000
+	xor_test.go:44: 1 xor 0 = 1.000000
+	xor_test.go:46: 0 xor 1 = 1.000000
+	xor_test.go:48: 0 xor 0 = 0.000000
+PASS
+ok  	github.com/jinseokYeom/esp	0.084s

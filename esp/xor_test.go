@@ -2,7 +2,6 @@ package esp
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"math/rand"
 	"testing"
@@ -25,12 +24,12 @@ func xorEval(nn *NNet) float64 {
 	return score
 }
 
-func TestXor(testing.T) {
+func TestXor(t *testing.T) {
 	s := time.Now().UnixNano()
 	rand.Seed(s)
 	param, err := NewESPParam("xortest.esp")
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	fmt.Printf("Seed: %d\n", s)
@@ -40,11 +39,11 @@ func TestXor(testing.T) {
 	e.Run(xorEval)
 	nn := e.BestNNet()
 	ans := nn.Update([]float64{1.0, 1.0})
-	fmt.Printf("1 xor 1 = %f\n", ans[0])
+	t.Logf("1 xor 1 = %f\n", ans[0])
 	ans = nn.Update([]float64{1.0, 0.0})
-	fmt.Printf("1 xor 0 = %f\n", ans[0])
+	t.Logf("1 xor 0 = %f\n", ans[0])
 	ans = nn.Update([]float64{0.0, 1.0})
-	fmt.Printf("0 xor 1 = %f\n", ans[0])
+	t.Logf("0 xor 1 = %f\n", ans[0])
 	ans = nn.Update([]float64{0.0, 0.0})
-	fmt.Printf("0 xor 0 = %f\n", ans[0])
+	t.Logf("0 xor 0 = %f\n", ans[0])
 }
