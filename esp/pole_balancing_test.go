@@ -10,24 +10,27 @@
 package esp
 
 import (
+	"fmt"
+	"math"
 	"math/rand"
 	"testing"
+	"time"
 )
 
 // physics sim constants
 const (
-	X_LIM        = 2.4    // x position limit [-2.4, 2.4]
-	DX_LIM       = 1.0    // x velocity limit [-1.0, 1.0]
-	TH_LIM       = 0.2    // theta limit [-0.2, 0.2]
-	DTH_LIM      = 1.5    // angular velocity limit [-1.5, 1.5]
-	GRAVITY      = 9.8    // gravity constant
-	CART_MASS    = 1.0    // mass of the cart
-	POLE_MASS    = 0.1    // mass of the pole
-	LENGTH       = 0.5    // half length of pole
-	FORCE_MAG    = 10.0   // force applied to the cart
-	TAU          = 0.02   // seconds between state updates
-	MAX_TIME     = 120000 // given time for each test
-	RANDOM_START = true   // true if start randomly
+	X_LIM        = 2.4      // x position limit [-2.4, 2.4]
+	DX_LIM       = 1.0      // x velocity limit [-1.0, 1.0]
+	TH_LIM       = 0.2      // theta limit [-0.2, 0.2]
+	DTH_LIM      = 1.5      // angular velocity limit [-1.5, 1.5]
+	GRAVITY      = 9.8      // gravity constant
+	CART_MASS    = 1.0      // mass of the cart
+	POLE_MASS    = 0.1      // mass of the pole
+	LENGTH       = 0.5      // half length of pole
+	FORCE_MAG    = 10.0     // force applied to the cart
+	TAU          = 0.02     // seconds between state updates
+	MAX_TIME     = 120000.0 // given time for each test
+	RANDOM_START = true     // true if start randomly
 )
 
 var (
@@ -42,19 +45,70 @@ func poleBalancing(nn *NNet) float64 {
 	// inputs[3]: (theta_dot) pole angular velocity
 	inputs := make([]float64, 4)
 	if RANDOM_START {
-		inputs[0] = (rand.Float64()%4800.0)/1000.0 - X_LIM
-		inputs[1] = (rand.Float64()%2000.0)/1000.0 - DX_LIM
-		inputs[2] = (rand.Float64()%400.0)/1000.0 - TH_LIM
-		inputs[3] = (rand.Float64()%3000.0)/1000.0 - DTH_LIM
+		inputs[0] = float64(rand.Int63()%4800)/1000.0 - X_LIM
+		inputs[1] = float64(rand.Int63()%2000)/1000.0 - DX_LIM
+		inputs[2] = float64(rand.Int63()%400)/1000.0 - TH_LIM
+		inputs[3] = float64(rand.Int63()%3000)/1000.0 - DTH_LIM
 	}
 	// play the game
-	for i := 0; i < MAX_TIME; i++ {
+	t := 0.0
+	for t < MAX_TIME {
 		outputs := nn.Update(inputs)
-
+		y := (outputs[0] <= outputs[1])
+		// apply action to the simulated cart-pole
+		inputs = cartPole(y, inputs)
 		// check for failure; if so, return steps
+		x := inputs[0]  // x position
+		th := inputs[2] // theta
+		if x < -X_LIM || x > X_LIM ||
+			th < -TH_LIM || th > TH_LIM {
+			return t
+		}
+		t++
 	}
+	return MAX_TIME - t
+}
+
+// cart-pole simulation
+func cartPole(action bool, inputs []float64) []float64 {
+	force := FORCE_MAG
+	if action {
+		force = -FORCE_MAG
+	}
+	theta := inputs[2]
+	cosTh := math.Cos(theta)
+	sinTh := math.Sin(theta)
+	temp := (force + POLE_MASS_LENGTH*
+		theta*theta*sinTh) / TOTAL_MASS
+	// angular acceleration
+	ath := (GRAVITY*sinTh - cosTh*temp) /
+		(LENGTH * (3.0/4.0 - POLE_MASS*cosTh*cosTh/TOTAL_MASS))
+	// x acceleration
+	ax := temp - POLE_MASS_LENGTH*ath*cosTh/TOTAL_MASS
+	// update states
+	inputs[0] += TAU * inputs[1]
+	inputs[1] += TAU * ax
+	inputs[2] += TAU * inputs[3]
+	inputs[3] += TAU * ath
+	return inputs
 }
 
 func TestPoleBalancing(t *testing.T) {
+	s := time.Now().UnixNano()
+	rand.Seed(s)
+	param, err := NewESPParam("poletest.esp")
+	if err != nil {
+		t.Fatal(err)
+	}
 
+	fmt.Printf("Seed: %d\n", s)
+	param.Show()
+
+	e := New(param)
+	e.Run(poleBalancing)
+
+	// test the best neural network
+	nn := e.BestNNet()
+	bestScore := MAX_TIME - poleBalancing(nn)
+	t.Logf("Best time: %f\n", bestScore)
 }
