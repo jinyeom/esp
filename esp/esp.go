@@ -6,14 +6,14 @@ import (
 )
 
 type ESP struct {
-	param      *ESPParam        // ESP parameter
+	param      *Param           // ESP parameter
 	network    *NNet            // neural network
 	population []*Subpopulation // group of subpopulations
 	bestScore  float64          // best score
 	bestNNet   *NNet            // best performing neural network
 }
 
-func New(p *ESPParam) *ESP {
+func New(p *Param) *ESP {
 	return &ESP{
 		param: p,
 		network: NewNNet(p.NumInput, p.NumOutput,

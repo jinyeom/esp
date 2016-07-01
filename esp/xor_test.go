@@ -27,7 +27,7 @@ func xorEval(nn *NNet) float64 {
 func TestXor(t *testing.T) {
 	s := time.Now().UnixNano()
 	rand.Seed(s)
-	param, err := NewESPParam("xortest.esp")
+	param, err := NewParam("xortest.esp")
 	if err != nil {
 		t.Fatal(err)
 	}

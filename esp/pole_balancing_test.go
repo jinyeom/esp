@@ -100,7 +100,7 @@ func cartPole(action bool, inputs []float64) []float64 {
 func TestPoleBalancing(t *testing.T) {
 	s := time.Now().UnixNano()
 	rand.Seed(s)
-	param, err := NewESPParam("poletest.esp")
+	param, err := NewParam("poletest.esp")
 	if err != nil {
 		t.Fatal(err)
 	}

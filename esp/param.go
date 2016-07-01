@@ -11,10 +11,11 @@ import (
 )
 
 // ESP parameter
-type ESPParam struct {
+type Param struct {
 	NumInput      int     // number of inputs
 	NumOutput     int     // number of outputs
 	NumNeuron     int     // number of neurons (+1 for bias)
+	NumNetwork    int     // number of neural network
 	SubpSize      int     // subpopulation size
 	NumGeneration int     // number of generations
 	NumAvgEval    int     // number of average evaluations
@@ -24,7 +25,7 @@ type ESPParam struct {
 	InitBestScore float64 // initial best score
 }
 
-func NewESPParam(filename string) (*ESPParam, error) {
+func NewParam(filename string) (*Param, error) {
 	if path.Ext(filename) != ".esp" {
 		err := errors.New(".esp file required for parameter")
 		return nil, err
@@ -49,7 +50,7 @@ func NewESPParam(filename string) (*ESPParam, error) {
 			fd[param] = value
 		}
 	}
-	return &ESPParam{
+	return &Param{
 		NumInput:      int(fd["NUM_INPUT"]),
 		NumOutput:     int(fd["NUM_OUTPUT"]),
 		NumNeuron:     int(fd["NUM_NEURON"]),
@@ -64,7 +65,7 @@ func NewESPParam(filename string) (*ESPParam, error) {
 }
 
 // print parameter
-func (p *ESPParam) Show() {
+func (p *Param) Show() {
 	fmt.Printf("%-30s%d\n", "Number of inputs: ", p.NumInput)
 	fmt.Printf("%-30s%d\n", "Number of outputs: ", p.NumOutput)
 	fmt.Printf("%-30s%d\n", "Number of neurons: ", p.NumNeuron)
