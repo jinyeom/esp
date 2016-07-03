@@ -1,6 +1,11 @@
 package maesp
 
-import "github.com/jinseokYeom/esp"
+import (
+	"fmt"
+	"math/rand"
+
+	"github.com/jinseokYeom/esp"
+)
 
 // Multi-Agent Enforced SubPopulation
 type MAESP struct {
@@ -43,10 +48,70 @@ func New(p *esp.Param) *MAESP {
 	}
 }
 
+// update the best score and best performing nnets
+func (m *MAESP) updateBest(ns float64, c []*Chromosome) {
+	if ns < m.bestScore {
+		fmt.Print("best score: %f\n", ns)
+		m.bestScore = ns
+		m.bestNNet = make([]*esp.NNet, m.param.NumNetwork)
+		for i := 1; i < m.param.NumNetwork; i++ {
+			prev := (i - 1) * m.param.NumNeuron
+			next := i * m.param.NumNeuron
+			chrom := c[prev:next]
+			m.bestNNet[i].Build(chrom)
+		}
+	}
+}
+
 func (m *MAESP) Run(evalfunc func(nn []*esp.NNet) float64) {
+	popSize := m.param.NumNeuron * m.param.NumNetwork
+	indices := make([]int, popSize)
+	chroms := make([]*esp.Chromosome, popSize)
 	numEval := m.param.NumAvgEval * m.param.NumNeuron * m.param.SubpSize
 	for i := 0; i < m.param.NumGeneration; i++ {
 		for j := 0; j < numVal; j++ {
+			// select neurons
+			for index, _ := range indices {
+				// randomly select an index
+				rn := rand.Intn(m.param.SubpSize)
+				c := e.population[index].chromosomes[rn]
+				chroms[index] = c
+				indices[index] = rn
+			}
+			// create neural networks and evaluate
+			for k := 1; k < m.param.NumNetwork; k++ {
+				prev := (k - 1) * m.param.NumNeuron
+				next := k * m.param.NumNeuron
+				m.networks[k].Build(chroms[prev:next])
+			}
+			score := evalfunc(m.networks)
+			// update the best neural nets
+			m.updateBest(score, m.networks)
+			for subpIndex, chromIndex := range indices {
+				// evaluate each selected chromosome
+				m.population[subpIndex].
+					chromosomes[chromIndex].Evaluate(score)
+			}
+		}
+		// crossover
+		for i, subp := range m.population {
+			p1 := subp.TSelect()
+			p2 := subp.TSelect()
+			parent1 := e.population[i].chromosomes[p1]
+			parent2 := e.population[i].chromosomes[p2]
+			child1, child2 :=
+				UCrossover(parent1, parent2, m.param.CrossoverRate)
+			// mutation
+			child1.Mutate(m.param.MutationRate)
+			child2.Mutate(m.param.MutationRate)
+			// population update
+			m.population[i].chromosomes[p1] = child1
+			m.population[i].chromosomes[p2] = child2
 		}
 	}
+}
+
+// get the best neural networks
+func (m *MAESP) BestNNets() []*esp.NNet {
+	return m.bestNNets
 }
