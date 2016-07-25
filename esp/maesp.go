@@ -1,35 +1,33 @@
-package maesp
+package esp
 
 import (
 	"fmt"
 	"math/rand"
-
-	"github.com/jinseokYeom/esp"
 )
 
 // Multi-Agent Enforced SubPopulation
 type MAESP struct {
-	param        *Param               // Multi-Agent ESP parameter
-	networks     []*esp.NNet          // neural networks for agents
-	population   []*esp.Subpopulation // group of subpopulations
-	bestScore    float64              // best team score
-	bestNetworks []*esp.NNet          // best performing neural networks
+	param        *Param           // Multi-Agent ESP parameter
+	networks     []*NNet          // neural networks for agents
+	population   []*Subpopulation // group of subpopulations
+	bestScore    float64          // best team score
+	bestNetworks []*NNet          // best performing neural networks
 }
 
-func New(p *esp.Param) *MAESP {
+func NewMAESP(p *Param) *MAESP {
 	return &MAESP{
 		param: p,
-		networks: func() []*esp.NNet {
-			nnets := make([]*esp.NNet, p.NumNetwork)
+		networks: func() []*NNet {
+			nnets := make([]*NNet, p.NumNetwork)
 			for i, _ := range nnets {
-				nnets[i] = esp.NewNNet(p.NumInput, p.NumOutput,
+				nnets[i] = NewNNet(p.NumInput, p.NumOutput,
 					p.NumNeuron, p.Response)
 			}
 			return nnets
 		}(),
-		population: func() []*esp.Subpopulation {
+		population: func() []*Subpopulation {
 			numNeuron := p.NumNeuron * p.NumNetwork
-			pop := make([]*esp.Subpopulation, numNeuron)
+			pop := make([]*Subpopulation, numNeuron)
 			length := p.NumInput + p.NumOutput
 			biasLen := p.NumOutput + p.NumNeuron - 1
 			for i := 0; i < p.NumNetwork; i++ {
@@ -53,7 +51,7 @@ func (m *MAESP) updateBest(ns float64, c []*Chromosome) {
 	if ns < m.bestScore {
 		fmt.Print("best score: %f\n", ns)
 		m.bestScore = ns
-		m.bestNNet = make([]*esp.NNet, m.param.NumNetwork)
+		m.bestNNet = make([]*NNet, m.param.NumNetwork)
 		for i := 1; i < m.param.NumNetwork; i++ {
 			prev := (i - 1) * m.param.NumNeuron
 			next := i * m.param.NumNeuron
@@ -63,10 +61,10 @@ func (m *MAESP) updateBest(ns float64, c []*Chromosome) {
 	}
 }
 
-func (m *MAESP) Run(evalfunc func(nn []*esp.NNet) float64) {
+func (m *MAESP) Run(evalfunc func(nn []*NNet) float64) {
 	popSize := m.param.NumNeuron * m.param.NumNetwork
 	indices := make([]int, popSize)
-	chroms := make([]*esp.Chromosome, popSize)
+	chroms := make([]*Chromosome, popSize)
 	numEval := m.param.NumAvgEval * m.param.NumNeuron * m.param.SubpSize
 	for i := 0; i < m.param.NumGeneration; i++ {
 		for j := 0; j < numVal; j++ {
@@ -93,25 +91,30 @@ func (m *MAESP) Run(evalfunc func(nn []*esp.NNet) float64) {
 					chromosomes[chromIndex].Evaluate(score)
 			}
 		}
-		// crossover
-		for i, subp := range m.population {
-			p1 := subp.TSelect()
-			p2 := subp.TSelect()
-			parent1 := e.population[i].chromosomes[p1]
-			parent2 := e.population[i].chromosomes[p2]
-			child1, child2 :=
-				UCrossover(parent1, parent2, m.param.CrossoverRate)
-			// mutation
-			child1.Mutate(m.param.MutationRate)
-			child2.Mutate(m.param.MutationRate)
-			// population update
-			m.population[i].chromosomes[p1] = child1
-			m.population[i].chromosomes[p2] = child2
-		}
+		// crossover / mutation
+		m.update()
+	}
+}
+
+func (m *MAESP) update() {
+	// crossover
+	for i, subp := range m.population {
+		p1 := subp.TSelect()
+		p2 := subp.TSelect()
+		parent1 := m.population[i].chromosomes[p1]
+		parent2 := m.population[i].chromosomes[p2]
+		child1, child2 :=
+			UCrossover(parent1, parent2, m.param.CrossoverRate)
+		// mutation
+		child1.Mutate(m.param.MutationRate)
+		child2.Mutate(m.param.MutationRate)
+		// population update
+		m.population[i].chromosomes[p1] = child1
+		m.population[i].chromosomes[p2] = child2
 	}
 }
 
 // get the best neural networks
-func (m *MAESP) BestNNets() []*esp.NNet {
+func (m *MAESP) BestNNets() []*NNet {
 	return m.bestNNets
 }

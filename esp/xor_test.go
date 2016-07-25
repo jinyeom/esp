@@ -35,7 +35,6 @@ func TestXor(t *testing.T) {
 	fmt.Printf("Seed: %d\n", s)
 	param.Show()
 
-	fmt.Printf("FINAL PERFORMANCE")
 	e := New(param)
 	e.Run(xorEval)
 	nn := e.BestNNet()

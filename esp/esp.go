@@ -1,9 +1,6 @@
 package esp
 
-import (
-	"fmt"
-	"math/rand"
-)
+import "math/rand"
 
 type ESP struct {
 	param      *Param           // ESP parameter
@@ -37,7 +34,7 @@ func New(p *Param) *ESP {
 // update the best score and best performing nnet
 func (e *ESP) updateBest(ns float64, c []*Chromosome) {
 	if ns < e.bestScore {
-		fmt.Printf("best score: %f\n", ns)
+		//fmt.Printf("best score: %f\n", ns)
 		e.bestScore = ns
 		e.bestNNet = NewNNet(e.param.NumInput, e.param.NumOutput,
 			e.param.NumNeuron, e.param.Response)
@@ -71,21 +68,27 @@ func (e *ESP) Run(evalfunc func(nn *NNet) float64) {
 					chromosomes[chromIndex].Evaluate(score)
 			}
 		}
-		// crossover
-		for i, subp := range e.population {
-			p1 := subp.TSelect()
-			p2 := subp.TSelect()
-			parent1 := e.population[i].chromosomes[p1]
-			parent2 := e.population[i].chromosomes[p2]
-			child1, child2 :=
-				UCrossover(parent1, parent2, e.param.CrossoverRate)
-			// mutation
-			child1.Mutate(e.param.MutationRate)
-			child2.Mutate(e.param.MutationRate)
-			// population update
-			e.population[i].chromosomes[p1] = child1
-			e.population[i].chromosomes[p2] = child2
-		}
+		// crossover/mutation
+		e.update()
+	}
+}
+
+// update population states
+func (e *ESP) update() {
+	// crossover
+	for i, subp := range e.population {
+		p1 := subp.TSelect()
+		p2 := subp.TSelect()
+		parent1 := e.population[i].chromosomes[p1]
+		parent2 := e.population[i].chromosomes[p2]
+		child1, child2 :=
+			UCrossover(parent1, parent2, e.param.CrossoverRate)
+		// mutation
+		child1.Mutate(e.param.MutationRate)
+		child2.Mutate(e.param.MutationRate)
+		// population update
+		e.population[i].chromosomes[p1] = child1
+		e.population[i].chromosomes[p2] = child2
 	}
 }
 
