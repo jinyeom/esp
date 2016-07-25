@@ -54,6 +54,7 @@ func NewParam(filename string) (*Param, error) {
 		NumInput:      int(fd["NUM_INPUT"]),
 		NumOutput:     int(fd["NUM_OUTPUT"]),
 		NumNeuron:     int(fd["NUM_NEURON"]),
+		NumNetwork:    int(fd["NUM_NETWORK"]),
 		SubpSize:      int(fd["SUBP_SIZE"]),
 		NumGeneration: int(fd["NUM_GENERATION"]),
 		NumAvgEval:    int(fd["NUM_AVG_EVAL"]),

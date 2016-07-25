@@ -7,11 +7,11 @@ import (
 
 // Multi-Agent Enforced SubPopulation
 type MAESP struct {
-	param        *Param           // Multi-Agent ESP parameter
-	networks     []*NNet          // neural networks for agents
-	population   []*Subpopulation // group of subpopulations
-	bestScore    float64          // best team score
-	bestNetworks []*NNet          // best performing neural networks
+	param      *Param           // Multi-Agent ESP parameter
+	networks   []*NNet          // neural networks for agents
+	population []*Subpopulation // group of subpopulations
+	bestScore  float64          // best team score
+	bestNNets  []*NNet          // best performing neural networks
 }
 
 func NewMAESP(p *Param) *MAESP {
@@ -33,16 +33,23 @@ func NewMAESP(p *Param) *MAESP {
 			for i := 0; i < p.NumNetwork; i++ {
 				// every first neuron is a bias
 				bias := i * p.NumNeuron
+				next := (i + 1) * p.NumNeuron
 				pop[bias] = NewSubpopulation(p.SubpSize, biasLen)
-				for j := bias + 1; j < p.NumNeuron; j++ {
+				for j := bias + 1; j < next; j++ {
 					pop[j] = NewSubpopulation(p.SubpSize, length)
 				}
 			}
 			return pop
 		}(),
 		bestScore: p.InitBestScore,
-		bestNNet: NewNNet(p.NumInput, p.NumOutput,
-			p.NumNeuron, p.Response),
+		bestNNets: func() []*NNet {
+			nnets := make([]*NNet, p.NumNetwork)
+			for i, _ := range nnets {
+				nnets[i] = NewNNet(p.NumInput, p.NumOutput,
+					p.NumNeuron, p.Response)
+			}
+			return nnets
+		}(),
 	}
 }
 
@@ -51,12 +58,12 @@ func (m *MAESP) updateBest(ns float64, c []*Chromosome) {
 	if ns < m.bestScore {
 		fmt.Print("best score: %f\n", ns)
 		m.bestScore = ns
-		m.bestNNet = make([]*NNet, m.param.NumNetwork)
+		m.bestNNets = make([]*NNet, m.param.NumNetwork)
 		for i := 1; i < m.param.NumNetwork; i++ {
 			prev := (i - 1) * m.param.NumNeuron
 			next := i * m.param.NumNeuron
 			chrom := c[prev:next]
-			m.bestNNet[i].Build(chrom)
+			m.bestNNets[i].Build(chrom)
 		}
 	}
 }
@@ -67,12 +74,12 @@ func (m *MAESP) Run(evalfunc func(nn []*NNet) float64) {
 	chroms := make([]*Chromosome, popSize)
 	numEval := m.param.NumAvgEval * m.param.NumNeuron * m.param.SubpSize
 	for i := 0; i < m.param.NumGeneration; i++ {
-		for j := 0; j < numVal; j++ {
+		for j := 0; j < numEval; j++ {
 			// select neurons
 			for index, _ := range indices {
 				// randomly select an index
 				rn := rand.Intn(m.param.SubpSize)
-				c := e.population[index].chromosomes[rn]
+				c := m.population[index].chromosomes[rn]
 				chroms[index] = c
 				indices[index] = rn
 			}
@@ -84,7 +91,7 @@ func (m *MAESP) Run(evalfunc func(nn []*NNet) float64) {
 			}
 			score := evalfunc(m.networks)
 			// update the best neural nets
-			m.updateBest(score, m.networks)
+			m.updateBest(score, chroms)
 			for subpIndex, chromIndex := range indices {
 				// evaluate each selected chromosome
 				m.population[subpIndex].
