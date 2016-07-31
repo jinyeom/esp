@@ -7,7 +7,7 @@ type ESP struct {
 	network    *NNet            // neural network
 	population []*Subpopulation // group of subpopulations
 	bestScore  float64          // best score
-	bestNNet   *NNet            // best performing neural network
+	best       []*Chromosome    // best performing chromosomes
 }
 
 func New(p *Param) *ESP {
@@ -26,8 +26,7 @@ func New(p *Param) *ESP {
 			return pop
 		}(),
 		bestScore: p.InitBestScore,
-		bestNNet: NewNNet(p.NumInput, p.NumOutput,
-			p.NumNeuron, p.Response),
+		best:      make([]*Chromosome, p.NumNeuron),
 	}
 }
 
@@ -36,9 +35,7 @@ func (e *ESP) updateBest(ns float64, c []*Chromosome) {
 	if ns < e.bestScore {
 		//fmt.Printf("best score: %f\n", ns)
 		e.bestScore = ns
-		e.bestNNet = NewNNet(e.param.NumInput, e.param.NumOutput,
-			e.param.NumNeuron, e.param.Response)
-		e.bestNNet.Build(c)
+		copy(e.best, c)
 	}
 }
 
@@ -94,5 +91,6 @@ func (e *ESP) update() {
 
 // get the best neural network
 func (e *ESP) BestNNet() *NNet {
-	return e.bestNNet
+	return NewNNet(e.param.NumInput, e.param.NumOutput,
+		e.param.NumNeuron, e.param.Response)
 }
