@@ -90,7 +90,6 @@ func (e *ESP) update() {
 }
 
 // get the best neural network
-func (e *ESP) BestNNet() *NNet {
-	return NewNNet(e.param.NumInput, e.param.NumOutput,
-		e.param.NumNeuron, e.param.Response)
+func (e *ESP) Best() []*Chromosome {
+	return e.best
 }
