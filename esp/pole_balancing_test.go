@@ -112,7 +112,9 @@ func TestPoleBalancing(t *testing.T) {
 	e.Run(poleBalancing)
 
 	// test the best neural network
-	nn := e.BestNNet()
+	best := e.Best()
+	nn := e.network
+	nn.Build(best)
 	bestScore := poleBalancing(nn)
 	fmt.Printf("Best time: %f\n", MAX_TIME-bestScore)
 }

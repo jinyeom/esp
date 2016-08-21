@@ -37,7 +37,9 @@ func TestXor(t *testing.T) {
 
 	e := New(param)
 	e.Run(xorEval)
-	nn := e.BestNNet()
+	best := e.Best()
+	nn := e.network
+	nn.Build(best)
 	ans := nn.Update([]float64{1.0, 1.0})
 	fmt.Printf("1 xor 1 = %f\n", ans[0])
 	ans = nn.Update([]float64{1.0, 0.0})

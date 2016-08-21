@@ -49,6 +49,13 @@ func UCrossover(p1, p2 *Chromosome, m float64) (c1, c2 *Chromosome) {
 		}
 }
 
+// copy another chromosome's info
+func (c *Chromosome) Copy(c1 *Chromosome) {
+	c.evaluated = c1.evaluated
+	c.score = c1.score
+	copy(c.gene, c1.gene)
+}
+
 // get fitness average fitness score
 func (c *Chromosome) Fitness() float64 {
 	if c.evaluated == 0 {
